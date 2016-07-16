@@ -14,16 +14,23 @@
     </style>
   </head>
   <body>
-    <div class='container'>
-      <div class='row'>
-        <div class='one-half column'>
-          <h3>Track your books.<br/><br/>Tell your friends.<br/><br/>Get back to reading.</h3><br/>
-          <a href='' class='button button-primary'>Start Now!</a>
-        </div>
-        <div class='one-half column'>
-          <img src='/images/books.jpg' width='500px'/>
+    <div class='markup'>
+      <div class='view-container container'>
+        <div class='landing-view'>
+          <div class='row'>
+            <div class='one-half column'>
+              <h3>Track your books.<br/><br/>Tell your friends.<br/><br/>Get back to reading.</h3><br/>
+              <a href='#book-1' class='button button-primary'>Start Now!</a>
+            </div>
+            <div class='one-half column'>
+              <img src='/images/books.jpg' width='500px'/>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+    <script type='text/javascript'>
+      $(window).ready(crb.appOnReady);
+    </script>
   </body>
 </html>
