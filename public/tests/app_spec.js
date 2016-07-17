@@ -28,10 +28,19 @@ describe('CurrentlyReadingBooks', function(){
 		expect(crb.bookView).toHaveBeenCalledWith('42');
 	});
 	
-	describe('book view', function() {
-		it('has a title that includes the book number', function() {
+	describe('reading section', function() {
+		it('can check if book has been read by hitting a button', function() {
 			var view = crb.bookView('1');
-			expect(view.text()).toEqual('Book #1 Coming soon!');
+			view.find('.pages-read').val('345');
+			view.find('.save-btn').click();
+			expect(view.find('.finished-book span').text()).toEqual('Congrats on finishing the book!');
+		});
+	
+		it('tells you how many pages are left to read', function() {
+			var view = crb.bookView('1');
+			view.find('.pages-read').val('300');
+			view.find('.save-btn').click();
+			expect(view.find('.message').text()).toEqual('Only 45 pages left to go!');
 		});
 	});
 });

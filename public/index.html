@@ -10,12 +10,47 @@
     <script src='/vendor.js'></script>
     <script src='/app.js'></script>
     <style type="text/css" media="all">
-      body { margin-top: 30px; }
+      body { margin-top: 60px; }
+      .templates { display: none; }
+      .inline-list {
+        margin-bottom: 0px;
+      }
+      .inline-list li {
+        display: inline;
+        margin: 0 20px 0 0;
+      }
+      .fixed-top {
+        position: fixed;
+        top: 0px;
+        z-index: 1024;
+      }
+      .no-select {
+        user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        -moz-user-select: none;
+      }
+      .hover-links a { text-decoration: none; }
+      .hover-links a:hover { text-decoration: underline; }
+      .nav-container {
+        padding-left: 40px;
+        background: #666;
+      }
+      .nav-container a { color: white; }
+      .text-lg { font-size: 24pt; }
     </style>
   </head>
   <body>
     <div class='markup'>
-      <div class='view-container container'>
+      <div class='nav-container no-select fixed-top u-full-width'>
+        <ul class='inline-list hover-links nav-list six columns'>
+          <li><a class='text-lg' href="#">Currently Reading Books</a></li>
+          <li><a href='#book-1'>Start</a></li>
+        </ul>
+      </div>
+      <div class='view-container container'>        
+      </div>
+      <div class='templates'>
         <div class='landing-view'>
           <div class='row'>
             <div class='one-half column'>
@@ -27,6 +62,25 @@
             </div>
           </div>
         </div>
+        <div class='book-view'>
+          <h3 class='title' data-name='title'></h3>
+          <p class='author'></p>
+          <h5>Pages:  <span data-name='pages'></span></h5>
+          <form>
+            <label for='pagesread'>I'm on page:</label>
+            <input class='pages-read' id='pagesread'></input>
+            <div>
+              <button class='button-primary save-btn'>Save Progress</button>
+              <p class='message'></p>
+            </div>
+          </form>
+        </div>
+        <div class='finished-book'>
+          <span>Congrats on finishing the book!</span> <a>Start a new book!</a>
+        </div>
+        <li class='next-btn'>
+          <a>Next Book</a>
+        </li>
       </div>
     </div>
     <script type='text/javascript'>
