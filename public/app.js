@@ -1,6 +1,10 @@
 'use strict';
 
-var crb = {};
+var crb = {
+	poolId: 'us-east-1:9d07b099-44b1-4a27-b5d2-843c07ee1a9a'
+};
+
+crb.identity = new $.Deferred();
 
 crb.template = function(name) {
 	return $('.templates .' + name).clone();
@@ -8,6 +12,14 @@ crb.template = function(name) {
 
 crb.landingView = function() {
 	return crb.template('landing-view');
+}
+
+crb.profileView = function() {
+	var view = crb.template('profile-view');
+	crb.identity.done(function(identity) {
+		view.find('.email').text(identity.email);
+	});
+	return view;
 }
 
 crb.bookView = function(data) {
@@ -67,6 +79,7 @@ crb.buildFinishedFlash = function(bookNum) {
 crb.showView = function(hash) {
 	var routes = {
 		'#book': crb.bookView,
+		'#profile': crb.profileView,
 		'': crb.landingView,
 		'#': crb.landingView
 	};
@@ -83,6 +96,7 @@ crb.appOnReady = function() {
 		crb.showView(window.location.hash);
 	};
 	crb.showView(window.location.hash);
+	crb.identity.done(crb.addProfileLink);
 }
 
 crb.books = [
@@ -113,4 +127,52 @@ crb.flashElement = function(elem, content) {
 
 crb.triggerEvent = function(name, args) {
 	$('.view-container>*').trigger(name, args);
+}
+
+function googleSignIn(googleUser) {
+	function refresh() {
+		return gapi.auth2.getAuthInstance().signIn({
+			prompt: 'login'
+		}).then(function(userUpdate) {
+			var creds = AWS.config.credentials;
+			var newToken = userUpdate.getAuthresponse().id_token;
+			creds.params.Logins['accounts.google.com'] = newToken;
+			return crb.awsRefresh();
+		})
+	}
+	var id_token = googleUser.getAuthResponse().id_token;
+	AWS.config.update({
+		region: 'us-east-1',
+		credentials: new AWS.CognitoIdentityCredentials({
+			IdentityPoolId: crb.poolId,
+			Logins: {
+				'accounts.google.com': id_token
+			}
+		})
+	})
+	crb.awsRefresh().then(function(id) {
+		crb.identity.resolve({
+			id: id,
+			email: googleUser.getBasicProfile().getEmail(),
+			refresh: refresh
+		});
+	});
+}
+
+crb.awsRefresh = function() {
+	var deferred = new $.Deferred();
+	AWS.config.credentials.refresh(function(err) {
+		if (err) {
+			deferred.reject(err);
+		} else {
+			deferred.resolve(AWS.config.credentials.identityId);
+		}
+	});
+	return deferred.promise();
+}
+
+crb.addProfileLink = function(profile) {
+	var link = crb.template('profile-link');
+	link.find('a').text(profile.email);
+	$('.signin-bar').prepend(link);
 }

@@ -2,11 +2,13 @@
 <html>
   <head>
     <meta charset='utf-8'>
+    <meta name="google-signin-client_id" content="947636324485-d0jfp08uf21tppsonda33l9j68u38ids.apps.googleusercontent.com"/>
     <title>Currently Reading Books</title>
     <link href='//fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
     <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.2/normalize.min.css'>
     <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css'>
     <script src='https://code.jquery.com/jquery-2.1.4.min.js'></script>
+    <script src='https://apis.google.com/js/platform.js' async defer></script>
     <script src='/vendor.js'></script>
     <script src='/app.js'></script>
     <style type="text/css" media="all">
@@ -38,6 +40,15 @@
       }
       .nav-container a { color: white; }
       .text-lg { font-size: 24pt; }
+      .navbar-padding {
+        padding-top: 7px;
+        display: inline-block;
+      }
+      .navbar-padding-lg {
+        padding-left: 5px;
+        padding-top: 14px;
+        display: inline-block;
+      }
     </style>
   </head>
   <body>
@@ -47,6 +58,11 @@
           <li><a class='text-lg' href="#">Currently Reading Books</a></li>
           <li><a href='#book-1'>Start</a></li>
         </ul>
+        <div class='four columns signin-bar'>
+          <span class='navbar-padding u-pull-right'>
+            <span class='g-signin2' data-onsuccess="googleSignIn"></span>
+          </span>
+        </div>
       </div>
       <div class='view-container container'>        
       </div>
@@ -61,6 +77,10 @@
               <img src='/images/books.jpg' width='500px'/>
             </div>
           </div>
+        </div>
+        <div class='profile-view'>
+          <h3>Your Profile</h3>
+          <div class='email'></div>
         </div>
         <div class='book-view'>
           <h3 class='title' data-name='title'></h3>
@@ -81,6 +101,9 @@
         <li class='next-btn'>
           <a>Next Book</a>
         </li>
+        <span class='profile-link navbar-padding-lg u-pull-right'>
+          <a href='#profile'></a>
+        </span>
       </div>
     </div>
     <script type='text/javascript'>
