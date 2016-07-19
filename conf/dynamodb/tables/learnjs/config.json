@@ -1,7 +1,7 @@
 {
   "AttributeDefinitions": [
     {
-      "AttributeName": "problemId", 
+      "AttributeName": "bookId", 
       "AttributeType": "N"
     }, 
     {
@@ -16,7 +16,7 @@
     }, 
     {
       "KeyType": "RANGE", 
-      "AttributeName": "problemId"
+      "AttributeName": "bookId"
     }
   ], 
   "ProvisionedThroughput": {

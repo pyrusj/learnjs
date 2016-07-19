@@ -27,14 +27,14 @@ crb.bookView = function(data) {
 	var view = crb.template('book-view');
 	var bookData = crb.books[bookNumber - 1];
 	var messageFlash = view.find('.message');
+	var pagesRead = view.find('.pages-read');
 	
 	function checkPages() {
-		var pagesRead = view.find('.pages-read').val();
 		var totalPages = bookData.pages
-		if (totalPages <= pagesRead) {
+		if (totalPages <= pagesRead.val()) {
 			var result = [true,'Congrats on finishing the book!'];
 		} else {
-			var result = [false, ('Only ' + (totalPages - pagesRead) + ' pages left to go!')];
+			var result = [false, ('Only ' + (totalPages - pagesRead.val()) + ' pages left to go!')];
 		}
 		return result;
 	}
@@ -46,6 +46,7 @@ crb.bookView = function(data) {
 		} else {
 			crb.flashElement(messageFlash, pageCheck[1]);
 		}
+		crb.savePages(bookNumber, pagesRead.val());
 		return false;
 	}
 	
@@ -57,6 +58,12 @@ crb.bookView = function(data) {
 			buttonItem.remove();
 		});
 	}
+	
+	crb.fetchPages(bookNumber).then(function(data) {
+		if (data.Item) {
+			pagesRead.val(data.Item.pages);
+		}
+	});
 	
 	view.find('.save-btn').click(checkPagesClick);
 	view.find('.author').text('by ' + crb.books[bookNumber - 1].author);
@@ -176,3 +183,58 @@ crb.addProfileLink = function(profile) {
 	link.find('a').text(profile.email);
 	$('.signin-bar').prepend(link);
 }
+
+crb.sendDbRequest = function(req, retry) {
+	var promise = new $.Deferred();
+	req.on('error', function(error) {
+		if (error.code === "CredentialError") {
+			crb.identity.then(function(identity) {
+				return identity.refresh().then(function() {
+					return retry();
+				}, function() {
+					promise.reject(resp);
+				});
+			});
+		} else {
+			promise.reject(error);
+		}
+	});
+	req.on('success', function(resp) {
+		promise.resolve(resp.data);
+	});
+	req.send();
+	return promise;
+}
+
+crb.savePages = function(bookId, pages) {
+	return crb.identity.then(function(identity) {
+		var db = new AWS.DynamoDB.DocumentClient();
+		var item = {
+			TableName: 'learnjs',
+			Item: {
+				userId: identity.id,
+				bookId: bookId,
+				pages: pages
+			}
+		};
+		return crb.sendDbRequest(db.put(item), function() {
+			return crb.savePages(bookId, pages);
+		})
+	});
+};
+
+crb.fetchPages = function(bookId) {
+	return crb.identity.then(function(identity) {
+		var db = new AWS.DynamoDB.DocumentClient();
+		var item = {
+			TableName: 'learnjs',
+			Key: {
+				userId: identity.id,
+				bookId: bookId
+			}
+		};
+		return crb.sendDbRequest(db.get(item), function() {
+			return crb.fetchPages(bookId);
+		})
+	});
+};
